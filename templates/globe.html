@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+{% block head %}
+        <meta charset="utf-8">
+        <!-- Include the CesiumJS JavaScript and CSS files -->
+        <script src="https://cesium.com/downloads/cesiumjs/releases/1.87.1/Build/Cesium/Cesium.js"></script>
+        <link href="https://cesium.com/downloads/cesiumjs/releases/1.87.1/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+{% block main %}
+        <div id="cesiumContainer" style="height: 100%; width: 100%"></div>
+            <script>
+
+            // Create countries as an array of all the elements in the data array passed from app.py
+            // Set up the globe once the site is loaded
+
+            var countries;
+            document.addEventListener("DOMContentLoaded", function(){
+                countries = '{{ structure | tojson }}';
+                countries = countries.replaceAll('\"', '').replaceAll('[','').replaceAll(']','').split(',');
+
+                // Your access token can be found at: https://cesium.com/ion/tokens.
+                // This is the default access token from your ion account
+
+                Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjMmUyYmZkNi05NGNlLTQyZDAtOTZhZC1lOGMwY2I5NzRjZTAiLCJpZCI6NzMzODEsImlhdCI6MTYzNjg2NDI4NH0.TK0s1PAU-mTcYaINOJUoUNxfyGDLEOnfGNAvLcYToaA';
+
+                // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+                const viewer = new Cesium.Viewer('cesiumContainer', {
+                    terrainProvider: Cesium.createWorldTerrain(),
+                    mapProjection : new Cesium.WebMercatorProjection()
+                });        
+
+                // Add Cesium OSM Buildings, a global 3D buildings layer.
+                const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
+
+                // Iterate through the countries array, using the names of countries as benchmarks
+
+                for (let i = 3; i < countries.length; i += 8)
+                {
+                    // Create a variable for the country description
+                    // Consists of the article image, link to article with text of article name, mail icon to share article
+                    // Replace () with comma at all positions, accounting for necessary replacement to split .csv file
+                    var desc = '\
+                            <img\
+                            height="130px"\
+                            style="float:left; margin: 0 1em 1em 0;"\
+                            src="' + countries[i + 4].replaceAll('()', ',') + '"/>\
+                            <a href="' + countries[i + 1].replaceAll('()', ',') + '" target="_blank">' + countries[i + 2].replaceAll('()', ',') + '</a>\
+                            <p><i>' + countries[i + 3] + '</i><p>\
+                            <a href="mailto:?subject=Check out this article about' + countries[i] + '!&amp;body=' + countries[i + 1].replaceAll('()', ',')  + '"\
+                            title="Share by Email">\
+                            <img src="http://png-2.findicons.com/files/icons/573/must_have/48/mail.png">\
+                            </a>';
+                    // For each country, create a marker at that country's latitude and longitude
+                    // Label the marker with the country's name
+                    // Click on the marker to reveal the article as a description
+                    viewer.entities.add({
+                        name : countries[i],
+                        position : Cesium.Cartesian3.fromDegrees(parseFloat(countries[i - 1]), parseFloat(countries[i - 2])),
+                        point : {
+                            pixelSize : 5,
+                            color : Cesium.Color.RED,
+                            outlineColor : Cesium.Color.WHITE,
+                            outlineWidth : 2
+                        },
+                        label : {
+                            text : countries[i],
+                            font : '11pt Roboto, sans-serif',
+                            backgroundColor : Cesium.Color.WHITE,
+                            fillColor : Cesium.Color.WHITE,
+                            outlineColor : Cesium.Color.BLACK,
+                            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                            outlineWidth : 2,
+                            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                            pixelOffset : new Cesium.Cartesian2(0, -9)
+                        },
+                        description : desc
+                    });
+                }
+
+            })
+
+            </script>
+        </div>
+{% endblock %}

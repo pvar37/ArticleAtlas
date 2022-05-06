@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.py-5 {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+}
+
+.navbar-brand {
+    margin-left: 10px;
+}
+
+@media (max-width: 768px)
+{
+    .navbar-nav {
+        margin-left: 10px;
+    }
+}
+
+.cesium-viewer-bottom, .cesium-viewer-animationContainer, .cesium-viewer-timelineContainer {
+    display: none!important;
+}
+
+.cesium-viewer, .cesium-infoBox-description {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.cesium-infoBox-iframe {
+    height: auto !important;
+}
+
+p {
+    color: white;
+}
+
+.about {
+    margin: 20px;
+    font-size: large;
+    margin-left: 50px !important;
+    margin-right:50px !important;
+    background-color: white;
+    color: black !important;
+}
